@@ -35,7 +35,9 @@ const ModelLoader = () => {
 
   const gltf = useLoader(GLTFLoader, "/nissan1.glb", (loader) => {
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.3/");
+    dracoLoader.setDecoderPath(
+      "https://www.gstatic.com/draco/versioned/decoders/1.5.3/"
+    );
     loader.setDRACOLoader(dracoLoader);
   });
 
@@ -73,7 +75,7 @@ const ModelLoader = () => {
 
     const handleMouseMove = () => {
       if (isRotating) {
-        console.log("mouse moved=====>>");
+        console.log("mouse moved=====>>", isDrag);
         setIsDrag(true);
       }
     };
@@ -85,32 +87,44 @@ const ModelLoader = () => {
 
   useEffect(() => {
     if (!clicked || !hovered2) return;
-    setOriginalColor((hovered2?.material as THREE.MeshBasicMaterial).color.clone());
+    setOriginalColor(
+      (hovered2?.material as THREE.MeshBasicMaterial).color.clone()
+    );
     setClicked(false);
   }, [clicked]);
 
   useEffect(() => {
     // TODO : if the mesh color is changed once and if we clickk on the very same mesh on very next time, it will not keep the color grey until the color is selected(it chnages back to the changed color(that was the new original)). fix that
     if (!selectedColor && !hovered2) return;
-    if (selectedColor) (hovered2?.material as THREE.MeshBasicMaterial).color.set(selectedColor); //here if the selected color is null it will set to the previous mesh color
-    setOriginalColor((hovered2?.material as THREE.MeshBasicMaterial).color.clone());
+    if (selectedColor)
+      (hovered2?.material as THREE.MeshBasicMaterial).color.set(selectedColor); //here if the selected color is null it will set to the previous mesh color
+    setOriginalColor(
+      (hovered2?.material as THREE.MeshBasicMaterial).color.clone()
+    );
     setSelectedColor(null);
     return () => {
       if (!selectedColor && originalColor) {
-        (hovered2?.material as THREE.MeshBasicMaterial).color.set(originalColor);
+        (hovered2?.material as THREE.MeshBasicMaterial).color.set(
+          originalColor
+        );
       }
     };
   }, [selectedColor, hovered2]);
 
   useFrame(() => {
-    const intersects: THREE.Intersection[] = raycaster.intersectObject(gltf.scene, true);
+    const intersects: THREE.Intersection[] = raycaster.intersectObject(
+      gltf.scene,
+      true
+    );
     if (!isRotating) {
       if (intersects.length > 0) {
         const mesh = intersects[0].object;
 
         if (mesh instanceof THREE.Mesh && mesh !== hovered) {
           if (hovered && originalColor) {
-            (hovered.material as THREE.MeshBasicMaterial).color.copy(originalColor);
+            (hovered.material as THREE.MeshBasicMaterial).color.copy(
+              originalColor
+            );
           }
           setHovered(mesh);
           setOriginalColor(mesh.material.color.clone());
@@ -118,7 +132,9 @@ const ModelLoader = () => {
         }
       } else {
         if (hovered && originalColor) {
-          (hovered.material as THREE.MeshBasicMaterial).color.copy(originalColor);
+          (hovered.material as THREE.MeshBasicMaterial).color.copy(
+            originalColor
+          );
           setHovered(null);
         }
       }
@@ -134,7 +150,13 @@ const ModelLoader = () => {
 
   return (
     <group>
-      <primitive object={gltf.scene} position={position} onClick={handleClick} onPointerMove={() => console.log(">>>>>>????")} {...bind()}>
+      <primitive
+        object={gltf.scene}
+        position={position}
+        onClick={handleClick}
+        onPointerMove={() => console.log(">>>>>>????")}
+        {...bind()}
+      >
         {gltf.scene &&
           gltf.scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
